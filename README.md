@@ -1,9 +1,9 @@
-dry
+Dry
 ===
 
 Automate and enhance your web development workflow
 
-dry will do for you in one command line `dry build`:
+Dry will do for you in one command line `dry build`:
 
 * compile & minify coffee scripts
 * compile & minify sass & css
@@ -21,6 +21,16 @@ working out-of-the-box in any directory with css/sass/cs/js/html files. no confi
 pip install dry
 ```
 
+## What can Dry do?
+
+If you want to experiment with Dry: create an empty directory and add one .html file inside that folder. then run in your bash: `dry build` and see how Dry will minify that (and every) html in that folder. Now try adding some css or maybe js files and see how they are all minified too.
+Dry supports also .scss/.sass files.
+
+you can watch folder for changes using:
+```bash
+dry watch
+```
+
 ## Usage
 
 Help on `dry` cli commands:
@@ -32,18 +42,7 @@ or
 dry -h
 ```
 
-To build project:
-```bash
-dry build
-```
 
-If you want to experiement with Dry - create an empty directory and add one .html file inside. now run in your bash: `dry build` and see how dry will minify every html in that folder. Now add some css or js files and see how they are minified too.
-you can watch folder for changes using:
-```bash
-dry watch
-```
-
-dry currently also supports .scss/.sass files.
 
 ## Settings
 You can create a settings.py file inside that folder with key=value pairs of settings.
@@ -58,7 +57,7 @@ templating = True
 ```
 
 ### templating = True
-By enabling templating in the settings dry will pass the templates inside Jinja2 templating engine
+By enabling templating in the settings Dry will pass the templates inside Jinja2 templating engine
 which enables you to:
 * Implement inheritence and other useful Jinja2 features.
 * use the `{{ css('file') }}` and `{{ js('file') }}` inside the templates. this will embedded into the html the minified js or css file from the same project. for example let say you have 2 files `index.html` and `index.css`, by using `{{ css('index') }} inside `index.html` the result minified css of `index.css` will be embedded into the final minified html of `index.html`.
