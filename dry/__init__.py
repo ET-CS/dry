@@ -25,6 +25,8 @@ from subprocess import call
 script_path = os.path.dirname(os.path.abspath(__file__))
 project_path = os.getcwd()
 
+verbose = True
+
 package = "dry"
 version = "0.1"
 conf_file_name = "settings.py"
@@ -188,7 +190,8 @@ class MyWatchHandler(FileSystemEventHandler):
 			compileJS(dir + "/")
 	    		compileHTML(dir + "/")
 
-if __name__ == '__main__':
+def main():
+    """Entry point for the application script"""
     arguments = docopt(__doc__, version=package.title() + " v" + version)
     #print(arguments)
     verbose = arguments['--verbose']
@@ -240,3 +243,4 @@ if __name__ == '__main__':
     		os.remove( target_folder+filename )
     	except:
     	    pass
+
