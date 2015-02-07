@@ -1,3 +1,5 @@
 *.min.html
 *.min.js
 *.min.css
+*.min.css.map
+.sass-cache
