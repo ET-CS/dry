@@ -16,6 +16,7 @@ Dry will do for you in one command line `dry build`:
 ## Dry philosophy
 
 There's a lot of Task Runners out there like Grunt or Gulp. Dry philosophy is:
+
 1. Automate the automation - Enough with long configuration files full of code - Environment should be be set-up in minimum effort and time.
 2. Watch my back and do it fast! - files should be compiled again as touched in background. `dry watch` should compile only touched files (and files dependent on that file) and not the entire project.
 3. Efficient - Your webserver should work with minified files. minification is each request is a bad thing.
