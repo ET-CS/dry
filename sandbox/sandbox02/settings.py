@@ -1,1 +1,1 @@
-target_folder = "public"
+target_folder = "build"

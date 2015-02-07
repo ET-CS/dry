@@ -232,20 +232,21 @@ def main():
     	    pass
 	try:
 	    for filename in glob.glob(target_folder+'*.min.html') :
-    		os.remove( target_folder+filename )
-    		print filename + " removed"
+    		os.remove( filename )
     	except:
     	    pass
 	try:
 	    for filename in glob.glob(target_folder+'*.min.css') :
-    		os.remove( target_folder+filename )
+    		os.remove( filename )
     	except:
     	    pass
     	try:
 	    for filename in glob.glob(target_folder+'*.min.js') :
-    		os.remove( target_folder+filename )
+    		os.remove( filename )
     	except:
     	    pass
+	if os.listdir(target_folder) == []:
+	    shutil.rmtree(target_folder)
 
 if __name__ == "__main__":
     main()
