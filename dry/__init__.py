@@ -240,6 +240,11 @@ def main():
     		os.remove( filename )
     	except:
     	    pass
+	try:
+	    for filename in glob.glob(target_folder+'*.min.css.map') :
+    		os.remove( filename )
+    	except:
+    	    pass
     	try:
 	    for filename in glob.glob(target_folder+'*.min.js') :
     		os.remove( filename )
