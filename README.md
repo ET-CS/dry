@@ -3,6 +3,8 @@ Dry
 
 Automate and enhance your web development workflow
 
+[![Build Status](https://travis-ci.org/ET-CS/dry.svg?branch=master)](https://travis-ci.org/ET-CS/dry)
+
 ## What does it mean?
 
 To efficiently serve your website, you need to create some workflow where you minify and compress your js/css/html parts.
