@@ -42,7 +42,7 @@ index.html:
 {% endblock %}
 ```
 
-_layout.html:
+_site.html:
 ```
 <!DOCTYPE HTML>
 <html>
@@ -58,6 +58,8 @@ _layout.html:
 ```
 
 after running the `dry build` command you will get the result minified html:
+
+index.min.html:
 ```
 <!DOCTYPE HTML><html><head><title>{{title}}</title></head><body><main><h1>Hello, world!</h1></main></body></html>
 ```
