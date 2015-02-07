@@ -28,7 +28,7 @@ project_path = os.getcwd()
 verbose = False
 
 package = "dry"
-version = "0.1"
+version = "0.0.4"
 conf_file_name = "settings.py"
 conf_full_path = project_path + "/../" + conf_file_name
 sys.path.append(project_path)
