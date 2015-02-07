@@ -25,7 +25,7 @@ from subprocess import call
 script_path = os.path.dirname(os.path.abspath(__file__))
 project_path = os.getcwd()
 
-verbose = True
+verbose = False
 
 package = "dry"
 version = "0.1"
@@ -66,7 +66,8 @@ flattensubs = True
 
 if templating:
     from jinja2 import Environment, FileSystemLoader
-    print os.path.normpath(os.path.join(project_path,target_folder))
+    if verbose:
+	print os.path.normpath(os.path.join(project_path,target_folder))
     loader = FileSystemLoader([
 	'.', 
 	#os.path.normpath( os.path.join(os.path.dirname(__file__),target_folder) )
@@ -77,13 +78,15 @@ if templating:
     env.globals['js'] = js_import
 
 def compileCSS(rootdir = ""):
-    print "compiling css..."
+    if verbose:
+	print "compiling css..."
     from rcssmin import cssmin
     types = ('.css', '.scss')
     for ftype in types:
         for filename in glob.glob(rootdir + "*" + ftype) :
 	    if filename[:1]!='_':
-	        print "compiling " + filename
+	        if verbose:
+	    	    print "compiling " + filename
 	        index = filename.find(ftype)
 	        output_filename = filename[:index] + '.min.css'
 	        if target_folder != '':
@@ -104,7 +107,8 @@ def compileCSS(rootdir = ""):
     #    sys.exit("failed.");
 
 def compileJS(rootdir = ""):
-    print "minifying js..."
+    if verbose:
+	print "minifying js..."
     for filename in glob.glob(rootdir + '*.js') :
 	if filename[:1]!='_':
 	    index = filename.find('.js')
@@ -117,7 +121,8 @@ def compileJS(rootdir = ""):
 		sys.exit("failed.");
 
 def compileHTML(rootdir = ""):
-    print "minifying html..."
+    if verbose:
+	print "minifying html..."
     from htmlmin.minify import html_minify
     for filename in glob.glob(rootdir + '*.html') :
 	if filename[:1]!='_':
@@ -135,7 +140,8 @@ def compileHTML(rootdir = ""):
 	        output_filename = output_filename.replace(rootdir, '')
 	    with open(output_filename, "w") as text_file:
 	        text_file.write(minified_html.encode('utf8'))
-	    print output_filename + " filename written."
+	    if verbose:
+		print output_filename + " filename written."
 
 def buildAll():
     if verbose:
@@ -150,7 +156,8 @@ def buildAll():
         dirs[:] = [d for d in dirs if d not in exclude]
         for dir in dirs:
 	    if dir + "/" != target_folder:
-	        print "directory: " + dir
+	        if verbose:
+	    	    print "directory: " + dir
 	        compileCSS(dir + "/")
     	        compileJS(dir + "/")
 	        compileHTML(dir + "/")
@@ -166,7 +173,8 @@ from watchdog.events import FileSystemEventHandler
 
 class MyWatchHandler(FileSystemEventHandler):
     def on_modified(self, event):
-	print "Event on: " + event.src_path
+	if verbose:
+	    print "Event on: " + event.src_path
 	if event.src_path[-5:]==".html":
     	    compileHTML()
 	    for subdir, dirs, files in os.walk("."):
@@ -193,7 +201,6 @@ class MyWatchHandler(FileSystemEventHandler):
 def main():
     """Entry point for the application script"""
     arguments = docopt(__doc__, version=package.title() + " v" + version)
-    #print(arguments)
     verbose = arguments['--verbose']
 
     if verbose:
@@ -203,7 +210,8 @@ def main():
 	buildAll()
 
     if arguments['watch']:
-	print "Watching " + project_path
+	if verbose:
+	    print "Watching " + project_path
         import time
 	from watchdog.observers import Observer
 	event_handler = MyWatchHandler()
@@ -244,3 +252,5 @@ def main():
     	except:
     	    pass
 
+if __name__ == "__main__":
+    main()
