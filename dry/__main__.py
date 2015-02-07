@@ -1,0 +1,2 @@
+from dry import *
+main()
