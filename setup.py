@@ -66,7 +66,22 @@ setup(
     # project is installed. For an analysis of "install_requires" vs pip's
     # requirements files see:
     # https://packaging.python.org/en/latest/requirements.html
-    #install_requires=['peppercorn'],
+    install_requires=[
+	'Jinja2',
+	'MarkupSafe',
+	'PyYAML1',
+	'argh',
+	'argparse',
+	'beautifulsoup4',
+	'cssmin',
+	'django-htmlmin',
+	'docopt',
+	'html5lib',
+	'pathtools',
+	'rcssmin',
+	'six',
+	'watchdog'
+    ],
 
     # List additional groups of dependencies here (e.g. development dependencies).
     # You can install these using the following syntax, for example:
