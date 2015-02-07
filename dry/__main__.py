@@ -1,2 +1,2 @@
-from dry import *
+from __init__ import *
 main()

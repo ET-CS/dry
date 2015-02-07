@@ -170,7 +170,6 @@ def buildAll():
 
 from watchdog.events import FileSystemEventHandler
 
-
 class MyWatchHandler(FileSystemEventHandler):
     def on_modified(self, event):
 	if verbose:
@@ -231,23 +230,19 @@ def main():
 	    shutil.rmtree('.sass-cache')
     	except:
     	    pass
-	#try:
-	#    if target_folder != '':
-	#	shutil.rmtree(target_folder)
-    	#except:
-    	#    pass
 	try:
-	    for filename in glob.glob(targetfolder+'*.min.html') :
+	    for filename in glob.glob(target_folder+'*.min.html') :
     		os.remove( target_folder+filename )
+    		print filename + " removed"
     	except:
     	    pass
 	try:
-	    for filename in glob.glob(targetfolder+'*.min.css') :
+	    for filename in glob.glob(target_folder+'*.min.css') :
     		os.remove( target_folder+filename )
     	except:
     	    pass
     	try:
-	    for filename in glob.glob(targetfolder+'*.min.js') :
+	    for filename in glob.glob(target_folder+'*.min.js') :
     		os.remove( target_folder+filename )
     	except:
     	    pass
