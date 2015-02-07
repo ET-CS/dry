@@ -250,8 +250,9 @@ def main():
     		os.remove( filename )
     	except:
     	    pass
-	if os.listdir(target_folder) == []:
-	    shutil.rmtree(target_folder)
+    	if target_folder != '':
+	    if os.listdir(target_folder) == []:
+		shutil.rmtree(target_folder)
 
 if __name__ == "__main__":
     main()
