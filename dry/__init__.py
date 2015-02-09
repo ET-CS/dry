@@ -12,9 +12,9 @@ Usage:
 Options:
   -h --help     Show this screen.
   --version     Show version.
-  --c=<fn>  	Configuration file name [default: dry.conf].
-  --quiet      print less text
-  --verbose    print more text
+  --c=<fn>      Configuration file name [default: dry.conf].
+  --quiet       print less text
+  --verbose     print more text
 
 """
 from docopt import docopt
@@ -27,8 +27,24 @@ project_path = os.getcwd()
 
 verbose = False
 
+# Get version from setup.py
 package = "dry"
-version = "0.0.4"
+from pkg_resources import get_distribution, DistributionNotFound
+import os.path
+try:
+    _dist = get_distribution(package)
+    # Normalize case for Windows systems
+    dist_loc = os.path.normcase(_dist.location)
+    here = os.path.normcase(__file__)
+    if not here.startswith(os.path.join(dist_loc, package)):
+        # not installed, but there is another version that *is*
+        raise DistributionNotFound
+except DistributionNotFound:
+    __version__ = '(local)'
+else:
+    __version__ = _dist.version
+
+version = __version__
 conf_file_name = "settings.py"
 conf_full_path = project_path + "/../" + conf_file_name
 sys.path.append(project_path)
