@@ -10,8 +10,8 @@ Release History
 
 - Supporting .less files using `lessc` command.
 
-0.0.4
-+++++
+0.0.4 (2015-02-07)
+++++++++++++++++++
 
 - Birth!
 
