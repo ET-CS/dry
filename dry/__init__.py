@@ -97,7 +97,7 @@ def compileCSS(rootdir = ""):
     if verbose:
 	print "compiling css..."
     from rcssmin import cssmin
-    types = ('.css', '.scss')
+    types = ('.css', '.scss', '.less')
     for ftype in types:
         for filename in glob.glob(rootdir + "*" + ftype) :
 	    if filename[:1]!='_':
@@ -111,6 +111,8 @@ def compileCSS(rootdir = ""):
 		    output_filename = output_filename.replace(rootdir, '')
 	        if ftype==".scss":
 	    	    call(["scss", "-t", "compressed", filename, output_filename])
+	    	if ftype==".less":
+	    	    call(["lessc", filename, '-x', '--clean-css', output_filename, " > " + output_filename])
 	    	if ftype==".css":
 	    	    with open (filename, "r") as myfile:
 		        css=myfile.read()
