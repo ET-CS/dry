@@ -45,26 +45,67 @@ else:
     __version__ = _dist.version
 
 version = __version__
-conf_file_name = "settings.py"
-conf_full_path = project_path + "/../" + conf_file_name
-sys.path.append(project_path)
+# depreceated? both not used anymore.
+#conf_file_name = "settings.py"
+#conf_full_path = project_path + "/../" + conf_file_name
+sys.path.append(project_path + "/.dry/")
 
 templating = False
 try:
-    import settings as settings
+    import config as settings
     templating = settings.templating
 except:
     pass
 
+template_engine = 'jinja2'
+if templating:
+    try:
+	import config as settings
+	template_engine = settings.template_engine
+    except:
+	pass
+
+template_context = {}
+if templating:
+    try:
+	import config as settings
+	template_context = settings.context
+    except:
+	pass
+
 target_folder = ""
 try:
-    import settings as settings
+    import config as settings
     target_folder = settings.target_folder
     if target_folder != '':
 	if target_folder[-1:] != '/':
 	    target_folder += '/'
     if not os.path.exists(target_folder):
 	os.makedirs(target_folder)
+except:
+    pass
+
+target_css_folder = target_folder
+try:
+    import config as settings
+    target_css_folder = settings.target_css_folder
+    if target_css_folder != '':
+	if target_css_folder[-1:] != '/':
+	    target_css_folder += '/'
+    if not os.path.exists(target_css_folder):
+	os.makedirs(target_css_folder)
+except:
+    pass
+
+target_js_folder = target_folder
+try:
+    import config as settings
+    target_js_folder = settings.target_js_folder
+    if target_js_folder != '':
+	if target_js_folder[-1:] != '/':
+	    target_js_folder += '/'
+    if not os.path.exists(target_js_folder):
+	os.makedirs(target_js_folder)
 except:
     pass
 
@@ -81,17 +122,22 @@ flattensubs = True
 
 
 if templating:
-    from jinja2 import Environment, FileSystemLoader
-    if verbose:
-	print os.path.normpath(os.path.join(project_path,target_folder))
-    loader = FileSystemLoader([
-	'.', 
-	#os.path.normpath( os.path.join(os.path.dirname(__file__),target_folder) )
-	target_folder,
-    ])
-    env = Environment(loader=loader)
-    env.globals['css'] = css_import
-    env.globals['js'] = js_import
+    if template_engine=='jinja2':
+        from jinja2 import Environment, FileSystemLoader
+	if verbose:
+	    print os.path.normpath(os.path.join(project_path,target_folder))
+        loader = FileSystemLoader([
+    	    '.', 
+	    #os.path.normpath( os.path.join(os.path.dirname(__file__),target_folder) )
+	    target_folder,
+        ])
+	env = Environment(loader=loader)
+        env.globals['css'] = css_import
+        env.globals['js'] = js_import
+    elif template_engine=='mako':
+	from mako.template import Template
+	from mako.lookup import TemplateLookup
+	mylookup = TemplateLookup(directories=[project_path])
 
 def compileCSS(rootdir = ""):
     if verbose:
@@ -105,8 +151,8 @@ def compileCSS(rootdir = ""):
 	    	    print "compiling " + filename
 	        index = filename.find(ftype)
 	        output_filename = filename[:index] + '.min.css'
-	        if target_folder != '':
-		    output_filename = target_folder + output_filename
+	        if target_css_folder != '':
+		    output_filename = target_css_folder + output_filename
 		if flattensubs:
 		    output_filename = output_filename.replace(rootdir, '')
 	        if ftype==".scss":
@@ -131,7 +177,7 @@ def compileJS(rootdir = ""):
 	if filename[:1]!='_':
 	    index = filename.find('.js')
 	    output_filename = filename[:index] + '.min.js'
-	    output_filename = target_folder + output_filename
+	    output_filename = target_js_folder + output_filename
 	    if flattensubs:
 		output_filename = output_filename.replace(rootdir, '')
 	    return_code = call(["minifyjs -m --level=1 -i "+filename+" -o "+output_filename], shell=True)
@@ -148,7 +194,10 @@ def compileHTML(rootdir = ""):
 	    output_filename = filename[:index] + '.min.html'
 	    output_filename = target_folder + output_filename
 	    if templating:
-		html = env.get_template(filename).render()
+		if template_engine == 'jinja2':
+		    html = env.get_template(filename).render(**template_context)
+		elif template_engine == 'mako':
+		    html = Template(filename=filename, lookup=mylookup).render(**template_context)
 	    else:
 	        with open (filename, "r") as myfile:
 		    html=myfile.read()
@@ -254,23 +303,29 @@ def main():
     	except:
     	    pass
 	try:
-	    for filename in glob.glob(target_folder+'*.min.css') :
+	    for filename in glob.glob(target_css_folder+'*.min.css') :
     		os.remove( filename )
     	except:
     	    pass
 	try:
-	    for filename in glob.glob(target_folder+'*.min.css.map') :
+	    for filename in glob.glob(target_css_folder+'*.min.css.map') :
     		os.remove( filename )
     	except:
     	    pass
     	try:
-	    for filename in glob.glob(target_folder+'*.min.js') :
+	    for filename in glob.glob(target_js_folder+'*.min.js') :
     		os.remove( filename )
     	except:
     	    pass
     	if target_folder != '':
 	    if os.listdir(target_folder) == []:
 		shutil.rmtree(target_folder)
+    	if target_css_folder != '' and target_css_folder != target_folder:
+	    if os.listdir(target_css_folder) == []:
+		shutil.rmtree(target_css_folder)
+    	if target_js_folder != '' and target_js_folder != target_folder and target_css_folder != target_js_folder:
+	    if os.listdir(target_js_folder) == []:
+		shutil.rmtree(target_js_folder)
 
 if __name__ == "__main__":
     main()
