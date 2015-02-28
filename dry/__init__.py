@@ -2,6 +2,7 @@
 """Dry.
 
 Usage:
+  dry init
   dry build [--quiet | --verbose] [--c=<fn>]
   dry clean
   dry watch
@@ -17,10 +18,12 @@ Options:
   --verbose     print more text
 
 """
+from __future__ import print_function
 from docopt import docopt
 import os, sys, glob
 sys.dont_write_bytecode = True
 from subprocess import call
+
 
 script_path = os.path.dirname(os.path.abspath(__file__))
 project_path = os.getcwd()
@@ -125,7 +128,7 @@ if templating:
     if template_engine=='jinja2':
         from jinja2 import Environment, FileSystemLoader
 	if verbose:
-	    print os.path.normpath(os.path.join(project_path,target_folder))
+	    print(os.path.normpath(os.path.join(project_path,target_folder)))
         loader = FileSystemLoader([
     	    '.', 
 	    #os.path.normpath( os.path.join(os.path.dirname(__file__),target_folder) )
@@ -141,14 +144,14 @@ if templating:
 
 def compileCSS(rootdir = ""):
     if verbose:
-	print "compiling css..."
+	print("compiling css...")
     from rcssmin import cssmin
     types = ('.css', '.scss', '.less')
     for ftype in types:
         for filename in glob.glob(rootdir + "*" + ftype) :
 	    if filename[:1]!='_':
 	        if verbose:
-	    	    print "compiling " + filename
+	    	    print("compiling " + filename)
 	        index = filename.find(ftype)
 	        output_filename = filename[:index] + '.min.css'
 	        if target_css_folder != '':
@@ -172,7 +175,7 @@ def compileCSS(rootdir = ""):
 
 def compileJS(rootdir = ""):
     if verbose:
-	print "minifying js..."
+	print("minifying js...")
     for filename in glob.glob(rootdir + '*.js') :
 	if filename[:1]!='_':
 	    index = filename.find('.js')
@@ -186,7 +189,7 @@ def compileJS(rootdir = ""):
 
 def compileHTML(rootdir = ""):
     if verbose:
-	print "minifying html..."
+	print("minifying html...")
     from htmlmin.minify import html_minify
     for filename in glob.glob(rootdir + '*.html') :
 	if filename[:1]!='_':
@@ -208,11 +211,11 @@ def compileHTML(rootdir = ""):
 	    with open(output_filename, "w") as text_file:
 	        text_file.write(minified_html.encode('utf8'))
 	    if verbose:
-		print output_filename + " filename written."
+		print(output_filename + " filename written.")
 
 def buildAll():
     if verbose:
-        print "Building project... ("+ project_path + ")"
+        print("Building project... ("+ project_path + ")")
 
     compileCSS()
     compileJS()
@@ -224,7 +227,7 @@ def buildAll():
         for dir in dirs:
 	    if dir + "/" != target_folder:
 	        if verbose:
-	    	    print "directory: " + dir
+	    	    print("directory: " + dir)
 	        compileCSS(dir + "/")
     	        compileJS(dir + "/")
 	        compileHTML(dir + "/")
@@ -233,14 +236,14 @@ def buildAll():
     #if return_code != 0:
     #    sys.exit("failed.");
     if verbose:
-        print "Done"
+        print("Done")
 
 from watchdog.events import FileSystemEventHandler
 
 class MyWatchHandler(FileSystemEventHandler):
     def on_modified(self, event):
 	if verbose:
-	    print "Event on: " + event.src_path
+	    print("Event on: " + event.src_path)
 	if event.src_path[-5:]==".html":
     	    compileHTML()
 	    for subdir, dirs, files in os.walk("."):
@@ -264,20 +267,56 @@ class MyWatchHandler(FileSystemEventHandler):
 			compileJS(dir + "/")
 	    		compileHTML(dir + "/")
 
+sample_config_file = """# set target directory for output files
+# you can also use something like: "../../static"
+#target_folder = "static"
+# Override target directory for css files
+#target_css_folder = "../static/css"
+# Override target directory for js files
+#target_js_folder = "../static/js"
+
+# Enabling templating will handle the .html files using Jinja2 templating engine,
+# Which mean you can now write your code with more advanced tools like inheritance.
+#templating = True
+
+# Choose template engine to render templates. `jinja2` (default) or `mako`. applicable only when templating = True
+#template_engine = 'mako'
+
+# pass context into template engine. create as dict and dry will extract it when passing it to template engine,
+# so you could use it with ${config['production']} in mako or {{ config.production }} in jinja2.
+#context = { 'config': { 'PRODUCTION': True } }
+"""
+
+def init_current_directory():
+    settings_directory=project_path+'/.dry'
+    settings_file=settings_directory+'/config.py'
+    if os.path.isdir(settings_directory):
+	# already initialized
+	print("directory already initialized.")
+	return
+    # init
+    os.makedirs(settings_directory)
+    f = open(settings_file,'w')
+    print(sample_config_file, file=f)
+    f.close()
+
 def main():
     """Entry point for the application script"""
     arguments = docopt(__doc__, version=package.title() + " v" + version)
     verbose = arguments['--verbose']
 
     if verbose:
-	print "Target Folder: " + target_folder + " (" + project_path +"/" + target_folder + ")"
+	print("Target Folder: " + target_folder + " (" + project_path +"/" + target_folder + ")")
+
+    if arguments['init']:
+	init_current_directory()
 
     if arguments['build']:
 	buildAll()
 
     if arguments['watch']:
 	if verbose:
-	    print "Watching " + project_path
+	    print("Watching " + project_path)
         import time
 	from watchdog.observers import Observer
 	event_handler = MyWatchHandler()
