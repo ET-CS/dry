@@ -19,6 +19,11 @@ Options:
 
 """
 from __future__ import print_function
+__author__ = "Etay Cohen-Solal"
+__copyright__ = "Copyright 2015, Etay Cohen-Solal"
+__license__ = "GNU"
+__maintainer__ = "Etay Cohen-Solal"
+__status__ = "Development"
 from docopt import docopt
 import os, sys, glob
 sys.dont_write_bytecode = True
