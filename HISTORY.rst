@@ -3,12 +3,13 @@
 Release History
 ---------------
 
-0.x.x (Future)
+0.1.1 (Future)
 ++++++++++++++
 
 **Improvements**
 
-- New `dry init` command which creates `/.dry` folder with sample `config.py` file inside.
+- New command: `dry init` which creates `/.dry` folder with sample `config.py` file inside.
+- New command: `dry build <filename> will build only that file.
 
 0.1.0 (2015-02-22)
 ++++++++++++++++++

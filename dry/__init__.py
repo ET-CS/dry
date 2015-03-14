@@ -4,6 +4,7 @@
 Usage:
   dry init
   dry build [--quiet | --verbose] [--c=<fn>]
+  dry build <file> [--verbose]
   dry clean
   dry watch
   dry deploy
@@ -29,6 +30,8 @@ import os, sys, glob
 sys.dont_write_bytecode = True
 from subprocess import call
 
+from htmlmin.minify import html_minify
+from rcssmin import cssmin
 
 script_path = os.path.dirname(os.path.abspath(__file__))
 project_path = os.getcwd()
@@ -127,8 +130,6 @@ def js_import(filename):
 
 flattensubs = True
 
-
-
 if templating:
     if template_engine=='jinja2':
         from jinja2 import Environment, FileSystemLoader
@@ -148,15 +149,10 @@ if templating:
 	mylookup = TemplateLookup(directories=[project_path])
 
 def compileCSS(rootdir = ""):
-    if verbose:
-	print("compiling css...")
-    from rcssmin import cssmin
     types = ('.css', '.scss', '.less')
     for ftype in types:
         for filename in glob.glob(rootdir + "*" + ftype) :
 	    if filename[:1]!='_':
-	        if verbose:
-	    	    print("compiling " + filename)
 	        index = filename.find(ftype)
 	        output_filename = filename[:index] + '.min.css'
 	        if target_css_folder != '':
@@ -164,23 +160,59 @@ def compileCSS(rootdir = ""):
 		if flattensubs:
 		    output_filename = output_filename.replace(rootdir, '')
 	        if ftype==".scss":
-	    	    call(["scss", "-t", "compressed", filename, output_filename])
+	    	    buildSCSSFile(filename, output_filename)
 	    	if ftype==".less":
-	    	    call(["lessc", filename, '-x', '--clean-css', output_filename, " > " + output_filename])
+	    	    buildLESSFile(filename, output_filename)
 	    	if ftype==".css":
-	    	    with open (filename, "r") as myfile:
-		        css=myfile.read()
-		    minified_css = cssmin(css)
-		    with open(output_filename, "w") as text_file:
-			text_file.write(minified_css)
+	    	    buildCSSFile(filename, output_filename)
     #return_code  = call(["compass", "compile"])
     #return_code  = call(["scss", "-t", "compressed", "index.css", "index.min.css"])
     #if return_code != 0:
     #    sys.exit("failed.");
 
-def compileJS(rootdir = ""):
+def buildJSFile(filename, output_filename):
     if verbose:
-	print("minifying js...")
+	print("compiling " + filename + " to " + output_filename)
+    return call(["minifyjs -m --level=1 -i "+filename+" -o "+output_filename], shell=True)
+
+def buildHTMLFile(filename, output_filename):
+    if verbose:
+	print("compiling " + filename + " to " + output_filename)
+    if templating:
+	if template_engine == 'jinja2':
+	    html = env.get_template(filename).render(**template_context)
+	elif template_engine == 'mako':
+	    html = Template(filename=filename, lookup=mylookup).render(**template_context)
+    else:
+        with open (filename, "r") as myfile:
+	    html=myfile.read()
+    minified_html = html_minify(unicode(html).encode('utf-8'))
+    #minified_html = html_minify(html)
+    with open(output_filename, "w") as text_file:
+        text_file.write(minified_html.encode('utf8'))
+    return 0
+
+def buildCSSFile(filename, output_filename):
+    if verbose:
+	print("compiling " + filename + " to " + output_filename)
+    with open (filename, "r") as myfile:
+        css=myfile.read()
+	minified_css = cssmin(css)
+	with open(output_filename, "w") as text_file:
+	    text_file.write(minified_css)
+    return 0
+
+def buildSCSSFile(filename, output_filename):
+    if verbose:
+	print("compiling " + filename + " to " + output_filename)
+    return call(["scss", "-t", "compressed", filename, output_filename])
+
+def buildLESSFile(filename, output_filename):
+    if verbose:
+	print("compiling " + filename + " to " + output_filename)
+    return call(["lessc", filename, '-x', '--clean-css', output_filename, " > " + output_filename])
+
+def compileJS(rootdir = ""):
     for filename in glob.glob(rootdir + '*.js') :
 	if filename[:1]!='_':
 	    index = filename.find('.js')
@@ -188,39 +220,40 @@ def compileJS(rootdir = ""):
 	    output_filename = target_js_folder + output_filename
 	    if flattensubs:
 		output_filename = output_filename.replace(rootdir, '')
-	    return_code = call(["minifyjs -m --level=1 -i "+filename+" -o "+output_filename], shell=True)
+	    return_code = buildJSFile(filename, output_filename)
 	    if return_code != 0:
 		sys.exit("failed.");
 
 def compileHTML(rootdir = ""):
-    if verbose:
-	print("minifying html...")
-    from htmlmin.minify import html_minify
     for filename in glob.glob(rootdir + '*.html') :
 	if filename[:1]!='_':
 	    index = filename.find('.html')
 	    output_filename = filename[:index] + '.min.html'
 	    output_filename = target_folder + output_filename
-	    if templating:
-		if template_engine == 'jinja2':
-		    html = env.get_template(filename).render(**template_context)
-		elif template_engine == 'mako':
-		    html = Template(filename=filename, lookup=mylookup).render(**template_context)
-	    else:
-	        with open (filename, "r") as myfile:
-		    html=myfile.read()
-	    minified_html = html_minify(unicode(html).encode('utf-8'))
-	    #minified_html = html_minify(html)
 	    if flattensubs:
 	        output_filename = output_filename.replace(rootdir, '')
-	    with open(output_filename, "w") as text_file:
-	        text_file.write(minified_html.encode('utf8'))
-	    if verbose:
-		print(output_filename + " filename written.")
+	    buildHTMLFile(filename, output_filename)
+
+def buildFile(file):
+    if file[-5:]=='.html':
+	buildHTMLFile(file, file.replace('.html', '.min.html'))
+	return
+    if file[-4:]=='.css':
+	buildCSSFile(file, file.replace('.css', '.min.css'))
+    	return
+    if file[-5:]=='.less':
+	buildLESSFile(file, file.replace('.less', '.min.css'))
+    	return
+    if file[-5:]=='.scss':
+	buildSCSSFile(file, file.replace('.scss', '.min.css'))
+    	return
+    if file[-3:]=='.js':
+	buildJSFile(file, file.replace('.js', '.min.js'))
+    	return
 
 def buildAll():
     if verbose:
-        print("Building project... ("+ project_path + ")")
+        print("building... ("+ project_path + ")")
 
     compileCSS()
     compileJS()
@@ -308,16 +341,20 @@ def init_current_directory():
 def main():
     """Entry point for the application script"""
     arguments = docopt(__doc__, version=package.title() + " v" + version)
+    global verbose
     verbose = arguments['--verbose']
 
     if verbose:
-	print("Target Folder: " + target_folder + " (" + project_path +"/" + target_folder + ")")
+	print("target folder: " + target_folder + " (" + project_path +"/" + target_folder + ")")
 
     if arguments['init']:
 	init_current_directory()
 
     if arguments['build']:
-	buildAll()
+	if arguments['<file>']:
+	    buildFile(arguments['<file>'])
+	else:
+	    buildAll()
 
     if arguments['watch']:
 	if verbose:

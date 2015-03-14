@@ -5,7 +5,12 @@ Automate and enhance your web development workflow
 
 [![Build Status](https://travis-ci.org/ET-CS/dry.svg?branch=master)](https://travis-ci.org/ET-CS/dry)
 
-## What does it mean?
+## Try it!
+
+Create one HTML file (or js file, or css file, or sass file, or less file...) inside empty directory,
+then run the command `dry build` and see how it's minified in seconds. no matter what file. no matter how many files.
+
+## What Dry knows to do?
 
 To efficiently serve your website, you need to create some workflow where you minify and compress your js/css/html parts.
 Dry will do for you in one command line `dry build`:
@@ -46,6 +51,13 @@ target_js_folder = "../static/js"
 ```
 
 That's it! no pipeline, no plugins to install and configure - everything bundled in. you can build .css, .less, .sass, .scss, .js, .html, jinja2 templates and mako templates OUT-OF-THE-BOX (and many more file types will follow soon - maybe you'll push the commit for some of them!)
+
+### Compile only one file
+
+Whenever you need to minify or compile any file: .SCSS, .LESS, .JS just use the:
+```
+dry build myfile.scss
+```
 
 ### Dynamic HTMLs
 Today most modern applications aren't just simple static HTML files. most backends are using one or other html templating engine.
