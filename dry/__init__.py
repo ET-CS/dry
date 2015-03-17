@@ -36,8 +36,6 @@ from rcssmin import cssmin
 script_path = os.path.dirname(os.path.abspath(__file__))
 project_path = os.getcwd()
 
-verbose = False
-
 # Get version from setup.py
 package = "dry"
 from pkg_resources import get_distribution, DistributionNotFound
@@ -60,6 +58,13 @@ version = __version__
 #conf_file_name = "settings.py"
 #conf_full_path = project_path + "/../" + conf_file_name
 sys.path.append(project_path + "/.dry/")
+
+verbose = False
+try:
+    import config as settings
+    verbose = settings.verbose
+except:
+    pass
 
 templating = False
 try:
@@ -323,6 +328,9 @@ sample_config_file = """# set target directory for output files
 # pass context into template engine. create as dict and dry will extract it when passing it to template engine,
 # so you could use it with ${config['production']} in mako or {{ config.production }} in jinja2.
 #context = { 'config': { 'PRODUCTION': True } }
+
+# Be more Verbose
+#verbose = True
 """
 
 def init_current_directory():

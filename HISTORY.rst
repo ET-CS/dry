@@ -3,6 +3,11 @@
 Release History
 ---------------
 
+X.X.X (Future)
+++++++++++++++
+
+- Verbose setting in config (like --verbose)
+
 0.1.1 (2015-03-14)
 ++++++++++++++++++
 
