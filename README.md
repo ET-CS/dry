@@ -8,27 +8,27 @@ Automate and enhance your web development workflow
 ## Try it!
 
 Create one HTML file (or js file, or css file, or sass file, or less file...) inside empty directory,
-then run the command `dry build` and see how it's minified in seconds. no matter what file. no matter how many files.
+thenת run the command `dry build` and see how the file(s) are minified in few seconds. no matter what file. no matter how many files.
 
 ## What Dry knows to do?
 
-To efficiently serve your website, you need to create some workflow where you minify and compress your js/css/html parts.
-Dry will do for you in one command line `dry build`:
+Using one simple `dry build` command, dry can do for you:
 
 * compile & minify js
-* compile & minify sass & css stylesheets
-* can inject minified css/js into html
-* minify html or html template
+* compile & minify sass & less & css stylesheets
+* inject minified css/js into html
+* minify html
+* render html(s) from template engine files (Jinja2, Mako currently supported)
 
 ## Dry philosophy
 
 There's a lot of Task Runners out there like Grunt or Gulp. Dry philosophy is:
 
-1. Automate the automation - Enough with long configuration files full of code - Environment should be be set-up in minimum effort and time.
+1. Automate the automation! - Enough with long configuration files full of code - Environment should be be set-up in minimum effort and time.
 2. Watch my back and do it fast! - files should be compiled again as touched in background. `dry watch` should compile only touched files (and files dependent on that file) and not the entire project.
-3. Efficient - Your webserver should work with minified files. minification in each request is a bad practice.
+3. Efficiency! - Your webserver should work with minified files. minification in each request is a bad practice.
 
-working out-of-the-box in any directory with css/sass/js/html files. no configuration whatsover needed but fully customized (target folder, templating, minify, etc.)
+working out-of-the-box in any directory with css/sass/less/js/html files. no configuration whatsover needed but fully customized (target folder, templating, minify, etc.)
 
     This project is in early development stages and not intended yet for production.
 
