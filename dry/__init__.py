@@ -25,21 +25,27 @@ __copyright__ = "Copyright 2015, Etay Cohen-Solal"
 __license__ = "GNU"
 __maintainer__ = "Etay Cohen-Solal"
 __status__ = "Development"
-from docopt import docopt
-import os, sys, glob
+
+import sys
+# don't write bytecode so config.pyc won't be created in each project dir
 sys.dont_write_bytecode = True
-from subprocess import call
 
-from htmlmin.minify import html_minify
-from rcssmin import cssmin
+import os
 
+### -----------
+### Directories
+### -----------
+# Dry path
 script_path = os.path.dirname(os.path.abspath(__file__))
-project_path = os.getcwd()
+# Current working dir
+current_working_dir = os.getcwd()
+# Project path = current_working_dir
+# TODO check parent(s) directory if it include .dry dir, then make it the project_dir instead
+project_path = current_working_dir
 
 # Get version from setup.py
 package = "dry"
 from pkg_resources import get_distribution, DistributionNotFound
-import os.path
 try:
     _dist = get_distribution(package)
     # Normalize case for Windows systems
@@ -52,27 +58,36 @@ except DistributionNotFound:
     __version__ = '(local)'
 else:
     __version__ = _dist.version
-
 version = __version__
 # depreceated? both not used anymore.
 #conf_file_name = "settings.py"
 #conf_full_path = project_path + "/../" + conf_file_name
 sys.path.append(project_path + "/.dry/")
 
-verbose = False
+###===--- Default settings
+DEFAULT_VERBOSE = False
+DEFAULT_TEMPLATING = False
+
+###===--- Load Settings
+# TODO create `config` dictionary instead of variables?
+
+"""Verbose mode - generates more output"""
+verbose = DEFAULT_VERBOSE
 try:
     import config as settings
     verbose = settings.verbose
 except:
     pass
 
-templating = False
+"""HTML(s) are Templates"""
+templating = DEFAULT_TEMPLATING
 try:
     import config as settings
     templating = settings.templating
 except:
     pass
 
+"""Template engine to use for templates"""
 template_engine = 'jinja2'
 if templating:
     try:
@@ -81,6 +96,12 @@ if templating:
     except:
 	pass
 
+# import templates-engines as (needed)
+if templating:
+    if template_engine=='jinja2':
+        import jinja2
+
+"""Context to pass to all templates"""
 template_context = {}
 if templating:
     try:
@@ -89,6 +110,7 @@ if templating:
     except:
 	pass
 
+"""Where output files should be created. default: empty (current dir)"""
 target_folder = ""
 try:
     import config as settings
@@ -101,6 +123,7 @@ try:
 except:
     pass
 
+"""Where to save output css files"""
 target_css_folder = target_folder
 try:
     import config as settings
@@ -113,6 +136,7 @@ try:
 except:
     pass
 
+"""Where to save output js files"""
 target_js_folder = target_folder
 try:
     import config as settings
@@ -125,15 +149,36 @@ try:
 except:
     pass
 
+# Should dry minify html/css/js (default: True)
+minify_html = True
+minify_css = True
+minify_js = True
+# Import minification libraries (as needed)
+if minify_html:
+    from htmlmin.minify import html_minify
+if minify_css:
+    from rcssmin import cssmin
+
+# What prefix and/or postfix to add to minified file name
+minify_prefix = ''
+minify_suffix = '.min'
+
+# Jinja2 markup to inject css file
 def css_import(filename):
-    import jinja2
+    """Markup for Jinja2 template engine - allows the {{css}} markup to inject minified css file"""
     return jinja2.Markup(loader.get_source(env, filename+'.min.css')[0])
 
+# Jinja2 markup to inject js file
 def js_import(filename):
-    import jinja2
+    """Markup for Jinja2 template engine - allows the {{css}} markup to inject minified js file"""
     return jinja2.Markup(loader.get_source(env, filename+'.min.js')[0])
 
 flattensubs = True
+
+###===--- Main part
+
+import glob
+from subprocess import call
 
 if templating:
     if template_engine=='jinja2':
@@ -191,6 +236,7 @@ def buildHTMLFile(filename, output_filename):
     else:
         with open (filename, "r") as myfile:
 	    html=myfile.read()
+    # TODO encode setting to allow user choose
     minified_html = html_minify(unicode(html).encode('utf-8'))
     #minified_html = html_minify(html)
     with open(output_filename, "w") as text_file:
@@ -334,6 +380,7 @@ sample_config_file = """# set target directory for output files
 """
 
 def init_current_directory():
+    """Initialize and create dry config file(s) inside current directory"""
     settings_directory=project_path+'/.dry'
     settings_file=settings_directory+'/config.py'
     if os.path.isdir(settings_directory):
@@ -348,7 +395,7 @@ def init_current_directory():
 
 def main():
     """Entry point for the application script"""
-    arguments = docopt(__doc__, version=package.title() + " v" + version)
+    from docopt import docopt; arguments = docopt(__doc__, version=package.title() + " v" + version)
     global verbose
     verbose = arguments['--verbose']
 
