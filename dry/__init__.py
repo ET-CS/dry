@@ -393,6 +393,9 @@ def init_current_directory():
     print(sample_config_file, file=f)
     f.close()
 
+def build(file):
+    buildFile(file)
+
 def main():
     """Entry point for the application script"""
     from docopt import docopt; arguments = docopt(__doc__, version=package.title() + " v" + version)
@@ -428,40 +431,47 @@ def main():
 	observer.join()
 
     if arguments['clean']:
-	import shutil
-	try:
-	    shutil.rmtree('.sass-cache')
-    	except:
-    	    pass
-	try:
-	    for filename in glob.glob(target_folder+'*.min.html') :
-    		os.remove( filename )
-    	except:
-    	    pass
-	try:
-	    for filename in glob.glob(target_css_folder+'*.min.css') :
-    		os.remove( filename )
-    	except:
-    	    pass
-	try:
-	    for filename in glob.glob(target_css_folder+'*.min.css.map') :
-    		os.remove( filename )
-    	except:
-    	    pass
-    	try:
-	    for filename in glob.glob(target_js_folder+'*.min.js') :
-    		os.remove( filename )
-    	except:
-    	    pass
-    	if target_folder != '':
-	    if os.listdir(target_folder) == []:
-		shutil.rmtree(target_folder)
-    	if target_css_folder != '' and target_css_folder != target_folder:
-	    if os.listdir(target_css_folder) == []:
-		shutil.rmtree(target_css_folder)
-    	if target_js_folder != '' and target_js_folder != target_folder and target_css_folder != target_js_folder:
-	    if os.listdir(target_js_folder) == []:
-		shutil.rmtree(target_js_folder)
+	clean()
+
+def clean():
+    import shutil
+    try:
+        shutil.rmtree('.sass-cache')
+    except:
+        pass
+
+    try:
+        for filename in glob.glob(target_folder+'*.min.html') :
+	    os.remove( filename )
+    except:
+        pass
+    try:
+        for filename in glob.glob(target_css_folder+'*.min.css') :
+	    os.remove( filename )
+    except:
+        pass
+
+    try:
+        for filename in glob.glob(target_css_folder+'*.min.css.map') :
+	    os.remove( filename )
+    except:
+        pass
+
+    try:
+        for filename in glob.glob(target_js_folder+'*.min.js') :
+	    os.remove( filename )
+    except:
+        pass
+
+    if target_folder != '':
+        if os.listdir(target_folder) == []:
+	    shutil.rmtree(target_folder)
+    if target_css_folder != '' and target_css_folder != target_folder:
+        if os.listdir(target_css_folder) == []:
+	    shutil.rmtree(target_css_folder)
+    if target_js_folder != '' and target_js_folder != target_folder and target_css_folder != target_js_folder:
+        if os.listdir(target_js_folder) == []:
+	    shutil.rmtree(target_js_folder)
 
 if __name__ == "__main__":
     main()
